@@ -18,7 +18,13 @@ app.use(async (ctx) => {
   const path = api.paths[ctx.path];
   if (path === undefined) {
     // 前后端分离, 处理前端相关静态文件
-    await send(ctx, ctx.path, { root: `${__dirname}/../dist` });
+    try {
+      await send(ctx, ctx.path, { root: `${__dirname}/../dist` });
+    } catch (err) {
+      ctx.status = 404;
+      // 注意要添加 404.html 到 dist 目录
+      // await send(ctx, '/404.html', { root: `${__dirname}/../dist` });
+    }
     return;
   }
   // 处理后端接口

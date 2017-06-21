@@ -1,7 +1,8 @@
 node_modules/
 .nyc_output/
 demo/
-
+dist/
+config/
 
 .DS_Store
 *.log
