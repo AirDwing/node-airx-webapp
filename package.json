@@ -1,0 +1,15 @@
+{
+  "name": "node-airx-webapp",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "dependencies": {
+    "@airx/sdk": "^0.2.2"
+  },
+  "repository": "git@github.com:willin/node-airx-webapp.git",
+  "author": "willin <willin@willin.org>",
+  "license": "Apache 2.0",
+  "devDependencies": {
+    "eslint": "^4.0.0",
+    "eslint-config-dwing": "^1.1.0"
+  }
+}
