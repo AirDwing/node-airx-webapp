@@ -1,4 +1,5 @@
 const Koa = require('koa');
+const send = require('koa-send');
 const SDK = require('@airx/sdk');
 const { isEmpty } = require('@dwing/common');
 
@@ -13,12 +14,18 @@ app.keys = keys;
 app.use(session(app));
 
 app.use(async (ctx) => {
-  if (ctx.path === '/favicon.ico') return;
   const api = await swagger();
-  const params = api.paths[ctx.path].params;
+  const path = api.paths[ctx.path];
+  if (path === undefined) {
+    // 前后端分离, 处理前端相关静态文件
+    await send(ctx, ctx.path, { root: `${__dirname}/../static` });
+    return;
+  }
+  // 处理后端接口
+  const params = path.params;
   const method = ctx.request.method.toLowerCase();
   const receivedParams = method === 'get' ? ctx.query : ctx.request.body;
-  if (params === undefined) return;
+
   const sdk = new SDK({
     SecretId: apiOptions.ak,
     SecretKey: apiOptions.sk,
