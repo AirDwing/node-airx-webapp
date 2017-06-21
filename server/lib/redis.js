@@ -1,5 +1,5 @@
 const redis = require('@dwing/redis');
-const { redis: redisOptions } = require('../../config');
+const { redis: redisOptions } = require('../config');
 
 const client = redis(redisOptions);
 const db = client.select(redisOptions.db);

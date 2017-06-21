@@ -1,7 +1,7 @@
 const r = require('request');
 const { getDefer, isEmpty } = require('@dwing/common');
 
-const { api: apiOptions } = require('../../config');
+const { api: apiOptions } = require('../config');
 const { get, set } = require('./redis');
 
 const redis = { set, get };

@@ -5,7 +5,7 @@ const { isEmpty } = require('@dwing/common');
 
 const session = require('./lib/session');
 const swagger = require('./lib/swagger');
-const { keys, api: apiOptions } = require('../config');
+const { keys, api: apiOptions } = require('./config');
 
 const app = new Koa();
 
@@ -18,7 +18,7 @@ app.use(async (ctx) => {
   const path = api.paths[ctx.path];
   if (path === undefined) {
     // 前后端分离, 处理前端相关静态文件
-    await send(ctx, ctx.path, { root: `${__dirname}/../static` });
+    await send(ctx, ctx.path, { root: `${__dirname}/../dist` });
     return;
   }
   // 处理后端接口
