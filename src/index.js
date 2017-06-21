@@ -1,4 +1,4 @@
 const app = require('./server');
-const { serverOptions } = require('../config');
+const { server: serverOptions } = require('../config');
 
 app.listen(serverOptions);
