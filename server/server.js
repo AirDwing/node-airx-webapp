@@ -13,9 +13,9 @@ app.keys = keys;
 
 app.use(session(app));
 
-app.use(async (ctx) => {
-  const api = await swagger();
-  const path = api.paths[ctx.path];
+app.use(async (ctx, next) => {
+  ctx.api = await swagger();
+  const path = ctx.api.paths[ctx.path];
   if (path === undefined) {
     // 前后端分离, 处理前端相关静态文件
     try {
@@ -27,15 +27,19 @@ app.use(async (ctx) => {
     }
     return;
   }
+  next();
+});
+
+app.use(async (ctx) => {
   // 处理后端接口
-  const params = path.params;
+  const params = ctx.api.paths[ctx.path].params;
   const method = ctx.request.method.toLowerCase();
   const receivedParams = method === 'get' ? ctx.query : ctx.request.body;
 
   const sdk = new SDK({
     SecretId: apiOptions.ak,
     SecretKey: apiOptions.sk,
-    Domain: api.host,
+    Domain: ctx.api.host,
     Secure: apiOptions.scheme === 'https'
   });
   if (ctx.path !== '/upload') {
