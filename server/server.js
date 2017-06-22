@@ -1,13 +1,14 @@
 const Koa = require('koa');
 const send = require('koa-send');
-const SDK = require('@airx/sdk');
-const { isEmpty } = require('@dwing/common');
+const { isEmpty, uuid } = require('@dwing/common');
 
 const session = require('./lib/session');
 const swagger = require('./lib/swagger');
-const { keys, api: apiOptions } = require('./config');
+const { upload, others } = require('./handler');
+const { keys } = require('./config');
 
 const app = new Koa();
+const ENV = process.env.NODE_ENV || 'development';
 
 app.keys = keys;
 
@@ -16,6 +17,10 @@ app.use(session(app));
 app.use(async (ctx, next) => {
   ctx.api = await swagger();
   const path = ctx.api.paths[ctx.path];
+  // ! 仅供开发测试, 允许跨域操作很危险
+  if (ENV === 'development') {
+    ctx.set('Access-Control-Allow-Origin', '*');
+  }
   if (path === undefined) {
     // 前后端分离, 处理前端相关静态文件
     try {
@@ -27,42 +32,29 @@ app.use(async (ctx, next) => {
     }
     return;
   }
-  next();
+  await next();
 });
 
 app.use(async (ctx) => {
-  // 处理后端接口
-  const params = ctx.api.paths[ctx.path].params;
-  const method = ctx.request.method.toLowerCase();
-  const receivedParams = method === 'get' ? ctx.query : ctx.request.body;
-
-  const sdk = new SDK({
-    SecretId: apiOptions.ak,
-    SecretKey: apiOptions.sk,
-    Domain: ctx.api.host,
-    Secure: apiOptions.scheme === 'https'
-  });
-  if (ctx.path !== '/upload') {
-    if (params.indexOf('auth') !== -1) {
-      // 处理需要登录的接口
-      const auth = ctx.session.auth;
-      if (isEmpty(auth)) {
-        ctx.status = 200;
-        ctx.body = { status: 0, code: 401 };
-        return;
-      }
-      receivedParams.auth = auth;
+  // 提供 guid 查询接口
+  if (ctx.path === '/guid') {
+    let guid = ctx.session.guid;
+    if (isEmpty(guid)) {
+      guid = uuid();
+      ctx.session.guid = guid;
     }
-    const result = await sdk[method](ctx.path, receivedParams);
-    if (ctx.path === '/user/login') {
-      ctx.session.auth = result.data.auth;
-      ctx.session.params = receivedParams;
-    }
-    // 处理登录超时(1小时重新登录)
     ctx.status = 200;
-    ctx.body = result;
-  } else {
+    ctx.body = { status: 1, data: { guid } };
+    return;
+  }
+  // 处理后端接口
+  // 封装sdk请求
+  if (ctx.path === '/upload') {
     // 处理上传
+    await upload(ctx);
+  } else {
+    // 处理其他接口
+    await others(ctx);
   }
 });
 
