@@ -1,5 +1,5 @@
 const SDK = require('@airx/sdk');
-const { isEmpty, getTimestamp, randStr } = require('@dwing/common');
+const { isEmpty, getTimestamp, randStr, uuid } = require('@dwing/common');
 const { encode } = require('@airx/authcode');
 
 const { doLogin } = require('../lib/helper');
@@ -45,7 +45,11 @@ module.exports = async (ctx) => {
 
   if (params.indexOf('guid') !== -1) {
     // 处理需要 guid 的接口
-    const guid = ctx.session.guid;
+    let guid = ctx.session.guid;
+    if (isEmpty(guid)) {
+      guid = uuid();
+      ctx.session.guid = guid;
+    }
     receivedParams.guid = guid;
   }
 
