@@ -1,3 +1,4 @@
+const parse = require('co-body');
 const SDK = require('@airx/sdk');
 const { isEmpty, getTimestamp, randStr, uuid } = require('@dwing/common');
 const { encode } = require('@airx/authcode');
@@ -7,7 +8,7 @@ const { api: apiOptions } = require('../config');
 
 module.exports = async (ctx) => {
   const method = ctx.request.method.toLowerCase();
-  const receivedParams = method === 'get' ? ctx.query : ctx.request.body;
+  const receivedParams = method === 'get' ? ctx.query : await parse(ctx.req);
 
   const sdk = new SDK({
     SecretId: apiOptions.ak,
