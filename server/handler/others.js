@@ -69,6 +69,7 @@ module.exports = async (ctx) => {
   // 记录登录信息
   if (ctx.path === '/user/login') {
     doLogin(ctx, result, receivedParams);
+    delete result.data.auth;
   }
   ctx.status = 200;
   ctx.body = result;
