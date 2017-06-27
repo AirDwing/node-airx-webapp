@@ -1,7 +1,6 @@
 const parse = require('co-body');
 const SDK = require('@airx/sdk');
-const { isEmpty, getTimestamp, randStr, uuid } = require('@dwing/common');
-const { encode } = require('@airx/authcode');
+const { isEmpty, getTimestamp, uuid } = require('@dwing/common');
 
 const { doLogin } = require('../lib/helper');
 const { api: apiOptions } = require('../config');
@@ -57,12 +56,6 @@ module.exports = async (ctx) => {
   if (params.indexOf('device') !== -1) {
     // 处理需要登录设备名称的接口
     receivedParams.device = 'AirX网页版';
-  }
-
-  if (params.indexOf('password') !== -1) {
-    // 处理需要 authcode加密 的接口
-    receivedParams.key = randStr(6);
-    receivedParams.passwod = encode(receivedParams.passwod, receivedParams.key);
   }
 
   const result = await sdk[method](ctx.path, receivedParams);
