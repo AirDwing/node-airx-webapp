@@ -8,6 +8,8 @@ const { api: apiOptions } = require('../config');
 module.exports = async (ctx) => {
   const method = ctx.request.method.toLowerCase();
   const receivedParams = method === 'get' ? ctx.query : await parse(ctx.req);
+  console.log(receivedParams);
+
 
   const sdk = new SDK({
     SecretId: apiOptions.ak,
@@ -43,14 +45,19 @@ module.exports = async (ctx) => {
     receivedParams.auth = auth;
   }
 
+  console.log(params.indexOf('guid'));
   if (params.indexOf('guid') !== -1) {
-    // 处理需要 guid 的接口
-    let guid = ctx.session.guid;
-    if (isEmpty(guid)) {
-      guid = uuid();
-      ctx.session.guid = guid;
+    // web端注册、登陆会传递有效值
+    if (ctx.path === '/user/register/mobile' || ctx.path === '/user/login') ;
+    else {
+      // 处理需要 guid 的接口
+      let guid = ctx.session.guid;
+      if (isEmpty(guid)) {
+        guid = uuid();
+        ctx.session.guid = guid;
+      }
+      receivedParams.guid = guid;
     }
-    receivedParams.guid = guid;
   }
 
   if (params.indexOf('device') !== -1) {
