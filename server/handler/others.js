@@ -43,21 +43,6 @@ module.exports = async (ctx) => {
     receivedParams.auth = auth;
   }
 
-  if (params.indexOf('guid') !== -1) {
-    // 处理需要 guid 的接口
-    let guid = ctx.session.guid;
-    if (isEmpty(guid)) {
-      guid = uuid();
-      ctx.session.guid = guid;
-    }
-    receivedParams.guid = guid;
-  }
-
-  if (params.indexOf('device') !== -1) {
-    // 处理需要登录设备名称的接口
-    receivedParams.device = 'AirX网页版';
-  }
-
   const result = await sdk[method](ctx.path, receivedParams);
   // 记录登录信息
   if (ctx.path === '/user/login') {

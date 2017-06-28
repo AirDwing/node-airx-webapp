@@ -37,14 +37,10 @@ app.use(async (ctx, next) => {
 
 app.use(async (ctx) => {
   // 提供 guid 查询接口
-  if (ctx.path === '/guid') {
-    let guid = ctx.session.guid;
-    if (isEmpty(guid)) {
-      guid = uuid();
-      ctx.session.guid = guid;
-    }
+  if (ctx.path === '/logout') {
+    ctx.session = null;
     ctx.status = 200;
-    ctx.body = { status: 1, data: { guid } };
+    ctx.body = { status: 1 };
     return;
   }
   // 处理后端接口
