@@ -1,6 +1,6 @@
 const parse = require('co-body');
 const SDK = require('@airx/sdk');
-const { isEmpty, getTimestamp, uuid } = require('@dwing/common');
+const { isEmpty, getTimestamp } = require('@dwing/common');
 
 const { doLogin } = require('../lib/helper');
 const { api: apiOptions } = require('../config');
