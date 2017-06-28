@@ -8,6 +8,8 @@ const { api: apiOptions } = require('../config');
 module.exports = async (ctx) => {
   const method = ctx.request.method.toLowerCase();
   const receivedParams = method === 'get' ? ctx.query : await parse(ctx.req);
+  console.log(receivedParams);
+
 
   const sdk = new SDK({
     SecretId: apiOptions.ak,
