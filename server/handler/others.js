@@ -8,8 +8,6 @@ const { api: apiOptions } = require('../config');
 module.exports = async (ctx) => {
   const method = ctx.request.method.toLowerCase();
   const receivedParams = method === 'get' ? ctx.query : await parse(ctx.req);
-  console.log(receivedParams);
-
 
   const sdk = new SDK({
     SecretId: apiOptions.ak,
@@ -49,7 +47,9 @@ module.exports = async (ctx) => {
   // 记录登录信息
   if (ctx.path === '/user/login') {
     doLogin(ctx, result, receivedParams);
-    delete result.data.auth;
+    if (result.data) {
+      delete result.data.auth;
+    }
   }
   ctx.status = 200;
   ctx.body = result;
