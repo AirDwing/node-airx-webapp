@@ -36,7 +36,7 @@ app.use(async (ctx, next) => {
 });
 
 app.use(async (ctx) => {
-  // 提供 guid 查询接口
+  // 提供 注销接口
   if (ctx.path === '/logout') {
     ctx.session = null;
     ctx.status = 200;
