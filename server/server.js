@@ -34,7 +34,7 @@ app.use(async (ctx, next) => {
     } catch (err) {
       ctx.status = 404;
       // 注意要添加 404.html 到 dist 目录
-      // await send(ctx, '/404.html', { root: `${__dirname}/../dist` });
+      await send(ctx, '/index.html', { root: `${__dirname}/../dist` });
     }
     return;
   }
