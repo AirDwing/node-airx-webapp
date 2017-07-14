@@ -1,6 +1,5 @@
 const Koa = require('koa');
 const send = require('koa-send');
-const { isEmpty, uuid } = require('@dwing/common');
 
 const session = require('./lib/session');
 const swagger = require('./lib/swagger');
@@ -22,6 +21,13 @@ app.use(async (ctx, next) => {
     ctx.set('Access-Control-Allow-Origin', '*');
   }
   if (path === undefined) {
+    // 提供 注销接口
+    if (ctx.path === '/logout') {
+      ctx.session = null;
+      ctx.status = 200;
+      ctx.body = { status: 1 };
+      return;
+    }
     // 前后端分离, 处理前端相关静态文件
     try {
       await send(ctx, ctx.path, { root: `${__dirname}/../dist` });
@@ -36,13 +42,6 @@ app.use(async (ctx, next) => {
 });
 
 app.use(async (ctx) => {
-  // 提供 注销接口
-  if (ctx.path === '/logout') {
-    ctx.session = null;
-    ctx.status = 200;
-    ctx.body = { status: 1 };
-    return;
-  }
   // 处理后端接口
   // 封装sdk请求
   if (ctx.path === '/upload') {
