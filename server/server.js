@@ -29,6 +29,9 @@ app.use(async (ctx, next) => {
       return;
     }
     // 前后端分离, 处理前端相关静态文件
+    if (ctx.path === '/') {
+      await send(ctx, '/index.html', { root: `${__dirname}/../dist` });
+    }
     try {
       await send(ctx, ctx.path, { root: `${__dirname}/../dist` });
     } catch (err) {
