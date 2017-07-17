@@ -26,14 +26,6 @@ module.exports = async (ctx) => {
       ctx.body = { status: 0, code: 401 };
       return;
     }
-    if (ctx.path === '/sms/send') {
-      let guid = ctx.session.guid;
-      if (isEmpty(guid)) {
-        guid = uuid();
-        ctx.session.guid = guid;
-      }
-      receivedParams.guid = guid;
-    }
 
     const ttl = ~~ctx.session.ttl;
     // 处理登录超时(1小时),提前10分钟重新获取auth
@@ -50,6 +42,15 @@ module.exports = async (ctx) => {
     }
 
     receivedParams.auth = auth;
+  }
+
+  if (ctx.path === '/sms/send') {
+    let guid = ctx.session.guid;
+    if (isEmpty(guid)) {
+      guid = uuid();
+      ctx.session.guid = guid;
+    }
+    receivedParams.guid = guid;
   }
 
   const result = await sdk[method](ctx.path, receivedParams);
