@@ -3,6 +3,7 @@ const { redis } = require('./redis');
 
 module.exports = app => session({
   store: {
+    maxAge: 86400000,
     get: async (key) => {
       const result = await redis.get(`airx:sess:${key}`);
       return JSON.parse(result || '{}');
