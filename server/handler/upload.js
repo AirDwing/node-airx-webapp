@@ -51,12 +51,11 @@ module.exports = async (ctx) => {
       return;
     }
   }
-
   const result = await sdk.upload({
     auth,
     type: parts.field.type,
     file
-  });
+  }, ctx.path);
   ctx.status = 200;
   ctx.body = result;
 };
