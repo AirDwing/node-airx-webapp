@@ -1,7 +1,31 @@
 const parse = require('await-busboy');
 const SDK = require('@airx/sdk');
 const { doLogin } = require('../lib/helper');
-const { isEmpty, getTimestamp } = require('@dwing/common');
+const { isEmpty, getTimestamp, getDefer } = require('@dwing/common');
+const { Writable } = require('stream');
+
+const handleFile = (part) => {
+  const deferred = getDefer();
+  const stream = new Writable();
+  stream.buffers = [];
+  stream.length = 0;
+  /* eslint-disable no-underscore-dangle */
+  stream._write = function (chunk, encoding, next) {
+    this.length = this.length + chunk.length;
+    this.buffers.push(chunk);
+    next();
+  };
+  /* eslint-disable no-nested-ternary */
+  stream.once('finish', function () {
+    const buffer = (this.buffers.length === 0 ? new Buffer(0) : (this.buffers.length === 1 ? this.buffers[0] : Buffer.concat(this.buffers, this.length)));
+    deferred.resolve(buffer);
+  });
+  stream.once('error', (err) => {
+    deferred.reject(err);
+  });
+  part.pipe(stream);
+  return deferred.promise;
+};
 
 const { api: apiOptions } = require('../config');
 
@@ -14,7 +38,7 @@ module.exports = async (ctx) => {
   /* eslint no-cond-assign:0, no-await-in-loop:0 */
   while (part = await parts) {
     if (part.filename) {
-      file.value = part.read();
+      file.value = await handleFile(part);
       file.options = {
         filename: part.filename,
         contentType: part.mimeType

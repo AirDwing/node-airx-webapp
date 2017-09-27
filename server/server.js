@@ -1,6 +1,5 @@
 const Koa = require('koa');
 const send = require('koa-send');
-
 const session = require('./lib/session');
 const swagger = require('./lib/swagger');
 const { upload, others } = require('./handler');
@@ -13,12 +12,14 @@ app.keys = keys;
 
 app.use(session(app));
 
+
 app.use(async (ctx, next) => {
   ctx.api = await swagger();
   const path = ctx.api.paths[ctx.path];
   // ! 仅供开发测试, 允许跨域操作很危险
   if (ENV === 'development') {
-    ctx.set('Access-Control-Allow-Origin', '*');
+    ctx.set('Access-Control-Allow-Credentials', true);
+    ctx.set('Access-Control-Allow-Origin', 'http://localhost:8080');
   }
   if (path === undefined) {
     // 提供 注销接口
@@ -47,7 +48,7 @@ app.use(async (ctx, next) => {
 app.use(async (ctx) => {
   // 处理后端接口
   // 封装sdk请求
-  if (ctx.path === '/upload') {
+  if (ctx.path.indexOf('/upload') !== -1) {
     // 处理上传
     await upload(ctx);
   } else {
